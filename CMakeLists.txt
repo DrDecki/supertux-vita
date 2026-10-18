@@ -49,6 +49,10 @@ project(SUPERTUX
         LANGUAGES C CXX
         VERSION 0.7.0)
 
+if(VITA)
+  include(SuperTux/Vita)
+endif()
+
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0069 NEW)
 endif()
@@ -477,6 +481,10 @@ endif()
 if(ANDROID)
   target_link_libraries(supertux2 PUBLIC log)
   target_compile_definitions(supertux2 PUBLIC -D__ANDROID__ -DANDROID)
+endif()
+
+if(VITA)
+  supertux_vita_package(supertux2)
 endif()
 
 ## Install stuff
