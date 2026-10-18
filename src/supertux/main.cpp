@@ -94,6 +94,7 @@ extern "C" {
 #include "util/string_util.hpp"
 #include "video/sdl_surface.hpp"
 #include "video/sdl_surface_ptr.hpp"
+#include "video/texture_manager.hpp"
 #include "video/ttf_surface_manager.hpp"
 #include "worldmap/worldmap.hpp"
 
@@ -687,6 +688,22 @@ Main::launch_game(const CommandLineArguments& args)
 #endif
   init_video();
 
+#ifdef __vita__
+  TextureManager::current()->preload({
+    "images/engine/menu/frame.png",
+    "images/engine/console.png",
+    "images/engine/console2.png",
+    "images/engine/menu/logo.png",
+    "images/engine/menu/mousecursor.png",
+    "images/engine/fonts/white.png",
+    "images/engine/fonts/shadow.png",
+    "images/engine/fonts/zh/white.png",
+    "images/engine/fonts/zh/shadow.png",
+    "images/engine/fonts/ko/white.png",
+    "images/engine/fonts/ko/shadow.png"
+  });
+#endif
+
   m_ttf_surface_manager.reset(new TTFSurfaceManager());
 
   s_timelog.log("audio");
@@ -824,6 +841,7 @@ Main::run(int argc, char** argv)
 #ifdef __vita__
   freopen("ux0:/data/supertux2/stdout.txt", "w", stdout);
   freopen("ux0:/data/supertux2/stderr.txt", "w", stderr);
+  setvbuf(stderr, nullptr, _IONBF, 0);
   setenv("LANG", vita_system_language(), 1);
 
   scePowerSetArmClockFrequency(444);
