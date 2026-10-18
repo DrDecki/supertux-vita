@@ -503,6 +503,9 @@ Sector::draw(DrawingContext& context)
     context.set_translation(camera.get_translation());
     context.scale(camera.get_current_scale());
   }
+#ifdef __vita__
+  context.set_translation(glm::floor(context.get_translation() + Vector(0.5f, 0.5f)));
+#endif
 
   GameObjectManager::draw(context);
 
