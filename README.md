@@ -1,97 +1,48 @@
-# SuperTux
+# SuperTux for PS Vita
 
-[![Windows](https://github.com/SuperTux/supertux/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/SuperTux/supertux/actions/workflows/windows.yml?branch=master)
-[![MacOS](https://github.com/SuperTux/supertux/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/SuperTux/supertux/actions/workflows/macos.yml?branch=master)
-[![GNU/Linux](https://github.com/SuperTux/supertux/actions/workflows/gnulinux.yml/badge.svg?branch=master)](https://github.com/SuperTux/supertux/actions/workflows/gnulinux.yml?branch=master)
-[![Android](https://github.com/SuperTux/supertux/actions/workflows/android.yml/badge.svg?branch=master)](https://github.com/SuperTux/supertux/actions/workflows/android.yml?branch=master)
-[![FreeBSD](https://github.com/SuperTux/supertux/actions/workflows/freebsd.yml/badge.svg?branch=master)](https://github.com/SuperTux/supertux/actions/workflows/freebsd.yml?branch=master)
-[![WebAssembly](https://github.com/SuperTux/supertux/actions/workflows/wasm.yml/badge.svg?branch=master)](https://github.com/SuperTux/supertux/actions/workflows/wasm.yml?branch=master)
-[![Github All Releases](https://img.shields.io/github/downloads/supertux/supertux/total.svg?maxAge=2592000)](https://github.com/SuperTux/supertux)
+A port of [SuperTux](https://github.com/SuperTux/supertux) 0.7.0 to the PlayStation Vita.
 
-SuperTux is a jump'n'run game with strong inspiration from the
-Super Mario Bros. games for the various Nintendo platforms.
-
-Run and jump through multiple worlds, fighting off enemies by jumping
-on them, bumping them from below or tossing objects at them, grabbing
-power-ups and other stuff on the way.
+SuperTux is a jump'n'run game with strong inspiration from the Super Mario Bros. games. Run and jump through multiple worlds, fighting off enemies by jumping on them, bumping them from below or tossing objects at them, grabbing power-ups and other stuff on the way.
 
 ![Screenshot](https://www.supertux.org/images/0_7_0/github_preview.png)
 
-
-## Story: Penny gets captured!
-
-Tux and Penny were out having a nice picnic on the ice fields of
-Antarctica. Suddenly, a creature jumped from behind an ice bush, there
-was a flash, and Tux fell asleep!
-
-When Tux wakes up, he finds that Penny is missing. Where she lay
-before now lies a letter:
->Tux, my arch enemy! I have captured your beautiful Penny and have
->taken her to my fortress. The path to my fortress is littered with my
->minions. Give up on the thought of trying to reclaim her, you haven't
->got a chance!
->
->-Nolok
-
-Tux looks and sees Nolok's fortress in the distance. Determined to
-save his beloved Penny, he begins his journey.
-
 ## Installation
 
-For major platforms, stable releases are built and available for download from
-[supertux.org](https://www.supertux.org/download.html) or alternatively directly
-from [GitHub](https://github.com/SuperTux/supertux/releases). You should be able
-to install these using default tools provided by your platform. On macOS, when
-Gatekeeper is enabled (default) it will refuse to open SuperTux. This is due to
-the lack of a signature on the application. If you wish to open SuperTux anyway
-without disabling the Gatekeeper feature entirely, you can open the application
-from the context menu (control click on the icon). macOS will then remember your
-choice the next time.
+1. Download `supertux2.vpk` and `supertux2.zip` from the [releases](https://github.com/DrDecki/supertux-vita/releases).
+2. Install `supertux2.vpk` with VitaShell.
+3. Extract `supertux2.zip` to `ux0:/data/`. You should end up with `ux0:/data/supertux2/data.zip`. Do not extract `data.zip` itself, the game reads it as it is.
+4. Start the game from the LiveArea.
 
-## Documentation
+Save games and settings are stored in `ux0:/data/supertux2/user`. The game uses the system language of your Vita, you can still pick another language in the options menu.
 
-Important documentation for SuperTux is contained in multiple files.
-Please see them:
+## Building
 
-* `INSTALL.md` - Requirements, compiling and installing.
-* `README.md` - This file
-* `NEWS.md` - Changes since the previous versions of SuperTux.
-* `LICENSE.txt` - The GNU General Public License, under whose terms SuperTux is
-licensed. (Most of the data subdirectory is also licensed under
-CC-by-SA)
-* `data/credits.stxt` - Credits for people that contributed to the creation of
-SuperTux. (You can view these in the game menu as well.)
+You need [VitaSDK](https://vitasdk.org) with these packages:
 
+```
+vdpm sdl2 sdl2_image physfs openal-soft fmt glm freetype libogg libvorbis libpng zlib bzip2 libwebp libjpeg-turbo
+```
 
-## Playing the game
+Then build the VPK:
 
-Both keyboards and joysticks/gamepads are supported. You can view/change the
-controls via **options > controls**. Basically, the only controls you will need
-to use in-game are the following: jump, duck, move left & right, do an action,
-and use the item pocket. An "action" allows you to pick up objects and use any
-powerup you have, such as shooting fireballs with the fire flower, or to fire
-ice pellets with the ice flower. The item pocket allows you to store a single
-additional item, which can be useful in dire situations.
+```
+git clone --recursive -b vita https://github.com/DrDecki/supertux-vita
+cd supertux-vita
+cmake -B build-vita -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+cmake --build build-vita -j$(nproc)
+```
 
-Other useful keys include the Esc key, which is used to go to the menu
-or to go up a level in the menu. The menu can be navigated using the
-arrow keys or the mouse.
+The game data has to be packed as an uncompressed zip, the game reads it much faster that way than single files:
 
-## Community
+```
+cd data
+python3 -c "import os,zipfile; z=zipfile.ZipFile('../data.zip','w',zipfile.ZIP_STORED); [z.write(os.path.join(r,f),os.path.relpath(os.path.join(r,f),'.')) for r,d,fs in os.walk('.') for f in fs]; z.close()"
+```
 
-In case you need help, feel free to reach out using the following means:
+## Credits
 
-* **IRC:** [#supertux](ircs://irc.libera.chat/#supertux) on
-  [Libera Chat](https://libera.chat) hosts most of the discussions between
-  developers. Also, real-time support can be provided here. If you don't know
-  how to use an IRC client, you access the channel using a web-based
-  [client](https://kiwiirc.com/nextclient/irc.libera.chat:+6697/?nick=Guest?#supertux).
-  Please stay around after asking questions, otherwise you will be disconnected
-  and might miss potential answers.
-* **[Forum](https://groups.f-hub.org/supertux):** The SuperTux
-  community is also active on the forum, the discussions range from feature
-  proposals to support questions. In particular, most community-contributed
-  add-ons are published there, so this is worth checking.
-* **Social Media:** Mostly on [Twitter](https://twitter.com/supertux_team) at
-  the moment.
-* **Discord:** Also, you can join our [Discord server](https://discord.com/invite/AcvtHWz) to get in touch with us.
+All credit for the game goes to the [SuperTux team](https://github.com/SuperTux/supertux) and its contributors.
+
+## License
+
+SuperTux is licensed under the GNU General Public License version 3 or later, see [LICENSE.txt](LICENSE.txt). The game data uses various licenses, see the files in the `data` folder for details.
